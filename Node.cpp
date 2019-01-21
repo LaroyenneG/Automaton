@@ -6,7 +6,7 @@
 #include <map>
 #include "Node.h"
 
-Node::Node(int _id, const std::vector<char> &_alphabet) : id(_id), alphabet(_alphabet) {
+Node::Node(int _id, const std::vector<char> &_alphabet) : id(_id), alphabet(_alphabet), outNode(false) {
 
 }
 
@@ -21,7 +21,7 @@ Node::~Node() {
 }
 
 bool Node::isOutput() const {
-    return transitions.empty();
+    return transitions.empty() || outNode;
 }
 
 void Node::removeNode(Node *node) {
@@ -71,4 +71,12 @@ void Node::putTransition(char letter, Node *node) {
 
 const std::map<char, Node *> &Node::getTransitions() const {
     return transitions;
+}
+
+void Node::markOutput() {
+    outNode = true;
+}
+
+void Node::unmarkOutput() {
+    outNode = false;
 }

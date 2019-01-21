@@ -11,6 +11,7 @@
 class Node {
 
 private:
+    bool outNode;
     int id;
     std::map<char, Node *> transitions;
     const std::vector<char> &alphabet;
@@ -27,6 +28,10 @@ public:
     void putTransition(char letter, Node *node);
 
     const std::map<char, Node *> &getTransitions() const;
+
+    void markOutput();
+
+    void unmarkOutput();
 
     ~Node();
 

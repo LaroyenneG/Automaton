@@ -13,8 +13,8 @@
 class Automaton {
 
 private:
-    static std::mutex mutex;
-    static int nodeCounter;
+    std::mutex mutex;
+    unsigned int nodeCounter;
 
     std::vector<char> alphabet;
 
@@ -22,7 +22,7 @@ private:
 
     Node *input;
 
-    int nextId() const;
+    int nextId();
 
 public:
     explicit Automaton();

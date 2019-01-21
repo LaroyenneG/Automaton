@@ -4,11 +4,7 @@
 
 #include "Automaton.h"
 
-std::mutex Automaton::mutex;
-
-int Automaton::nodeCounter = 0;
-
-int Automaton::nextId() const {
+int Automaton::nextId() {
 
     mutex.lock();
 
@@ -19,14 +15,15 @@ int Automaton::nextId() const {
     return id;
 }
 
-Automaton::Automaton() : input(nullptr) {
+Automaton::Automaton() : input(nullptr), nodeCounter(0) {
     input = generateNewNode();
 }
 
 Automaton::operator std::string() const {
 
-    std::string string = "Automaton";
+    std::string string = "Automaton(";
     string.append(std::to_string(nodes.size()));
+    string.append(")");
 
     return string;
 }
@@ -86,14 +83,13 @@ bool Automaton::recognize(const std::string &word) const {
     int cursor = 0;
 
     Node *pNode = input;
-    while (!pNode->isOutput()) {
-
-        pNode = pNode->next(word[cursor]);
-        if (pNode == nullptr) {
-            return false;
-        }
+    while ((pNode = pNode->next(word[cursor])) != nullptr) {
 
         cursor++;
+
+        if (pNode->isOutput() && cursor == word.size()) {
+            break;
+        }
     }
 
     return cursor == word.size();
