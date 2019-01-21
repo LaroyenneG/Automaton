@@ -12,14 +12,14 @@ class Node {
 
 private:
     bool outNode;
-    int id;
+    unsigned int id;
     std::map<char, Node *> transitions;
     const std::vector<char> &alphabet;
 
 public:
-    explicit Node(int _id, const std::vector<char> &_alphabet);
+    explicit Node(unsigned int _id, const std::vector<char> &_alphabet);
 
-    int getId() const;
+    unsigned int getId() const;
 
     bool isOutput() const;
 
@@ -35,7 +35,7 @@ public:
 
     ~Node();
 
-    Node *next(char c) const;
+    Node *next(char letter) const;
 };
 
 

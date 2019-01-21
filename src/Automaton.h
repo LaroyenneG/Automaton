@@ -22,7 +22,7 @@ private:
 
     Node *input;
 
-    int nextId();
+    unsigned int nextNodeId();
 
 public:
     explicit Automaton();
@@ -46,6 +46,9 @@ public:
     ~Automaton();
 
     bool operator==(const std::string &word) const;
+
+
+    static bool letterIsInAlphabet(const std::vector<char> alphabet, char letter);
 };
 
 

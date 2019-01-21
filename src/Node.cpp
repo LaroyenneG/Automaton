@@ -5,20 +5,16 @@
 #include <vector>
 #include <map>
 #include "Node.h"
+#include "Automaton.h"
 
-Node::Node(int _id, const std::vector<char> &_alphabet) : id(_id), alphabet(_alphabet), outNode(false) {
-
+Node::Node(unsigned int _id, const std::vector<char> &_alphabet) : id(_id), alphabet(_alphabet), outNode(false) {
 }
 
-int Node::getId() const {
+unsigned int Node::getId() const {
     return id;
 }
 
-Node::~Node() {
-    for (auto &transition : transitions) {
-        delete transition.second;
-    }
-}
+Node::~Node() = default;
 
 bool Node::isOutput() const {
     return transitions.empty() || outNode;
@@ -40,31 +36,31 @@ void Node::removeNode(Node *node) {
     }
 }
 
-Node *Node::next(char c) const {
+Node *Node::next(char letter) const {
 
-    auto it = transitions.find(c);
-    if (it != transitions.end()) {
-        return (*it).second;
+    if (!Automaton::letterIsInAlphabet(alphabet, letter)) {
+        throw std::string("unknown letter");
     }
 
-    return nullptr;
+    Node *pNode = nullptr;
+
+    auto it = transitions.find(letter);
+    if (it != transitions.end()) {
+        pNode = (*it).second;
+    }
+
+    return pNode;
 }
 
 void Node::putTransition(char letter, Node *node) {
 
-    bool find = false;
-
-    for (auto &c: alphabet) {
-        if (c == letter) {
-            find = true;
-            break;
-        }
+    if (!Automaton::letterIsInAlphabet(alphabet, letter)) {
+        throw std::string("unknown letter");
     }
 
-    if (!find) {
-        throw "un know letter";
+    if (node == nullptr) {
+        throw std::string("node can not be null");
     }
-
 
     transitions[letter] = node;
 }

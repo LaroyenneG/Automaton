@@ -4,11 +4,11 @@
 
 #include "Automaton.h"
 
-int Automaton::nextId() {
+unsigned int Automaton::nextNodeId() {
 
     mutex.lock();
 
-    int id = nodeCounter++;
+    unsigned int id = nodeCounter++;
 
     mutex.unlock();
 
@@ -41,7 +41,7 @@ Automaton::~Automaton() {
 
 Node *Automaton::generateNewNode() {
 
-    Node *node = new Node(nextId(), alphabet);
+    Node *node = new Node(nextNodeId(), alphabet);
 
     nodes.push_back(node);
 
@@ -105,4 +105,18 @@ Node *Automaton::getInput() const {
 
 const std::vector<char> &Automaton::getAlphabet() const {
     return alphabet;
+}
+
+bool Automaton::letterIsInAlphabet(const std::vector<char> alphabet, char letter) {
+
+    bool find = false;
+
+    for (auto &c: alphabet) {
+        if (c == letter) {
+            find = true;
+            break;
+        }
+    }
+
+    return find;
 }
