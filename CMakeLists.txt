@@ -8,7 +8,13 @@ add_executable(Automaton
         src/Automaton.cpp
         src/Automaton.h
         src/Node.cpp
-        src/Node.h test/main.cpp test/NodeTest.cpp test/NodeTest.h)
+        src/Node.h
+        test/main.cpp
+        test/NodeTest.cpp
+        test/NodeTest.h
+        test/AutomatonTest.cpp
+        test/AutomatonTest.h
+        )
 
 target_link_libraries(Automaton cppunit)
 target_link_libraries(Automaton pthread)

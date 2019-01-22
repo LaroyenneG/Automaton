@@ -47,8 +47,7 @@ public:
 
     bool operator==(const std::string &word) const;
 
-
-    static bool letterIsInAlphabet(const std::vector<char> alphabet, char letter);
+    static bool letterIsInAlphabet(const std::vector<char> &alphabet, char letter);
 };
 
 

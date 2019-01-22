@@ -7,6 +7,7 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include "NodeTest.h"
+#include "AutomatonTest.h"
 
 int main(int argc, char **argv) {
 
@@ -18,6 +19,7 @@ int main(int argc, char **argv) {
     CppUnit::TextTestRunner runner;
 
     runner.addTest(new NodeTest("Node class test"));
+    runner.addTest(new AutomatonTest("Automaton class test"));
 
     runner.run();
 

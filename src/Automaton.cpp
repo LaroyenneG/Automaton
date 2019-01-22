@@ -33,9 +33,8 @@ void Automaton::addLetter(char c) {
 }
 
 Automaton::~Automaton() {
-
-    for (auto &node : nodes) {
-        destroyNode(node);
+    while (!nodes.empty()) {
+        destroyNode(nodes.front());
     }
 }
 
@@ -50,9 +49,15 @@ Node *Automaton::generateNewNode() {
 
 void Automaton::destroyNode(Node *node) {
 
+    for (Node *&n : nodes) {
+        n->removeNode(node);
+    }
+
     nodes.remove(node);
 
-    input->removeNode(node);
+    if (node == input) {
+        input = nullptr;
+    }
 
     delete node;
 }
@@ -64,35 +69,42 @@ bool Automaton::operator==(const std::string &word) const {
 
 bool Automaton::recognize(const std::string &word) const {
 
-    for (auto &c : word) {
+    bool invalidLetter = false;
 
-        bool find = false;
-
-        for (auto &l : alphabet) {
-            if (l == c) {
-                find = true;
-                break;
-            }
-        }
-
-        if (!find) {
-            return false;
-        }
-    }
-
-    int cursor = 0;
-
-    Node *pNode = input;
-    while ((pNode = pNode->next(word[cursor])) != nullptr) {
-
-        cursor++;
-
-        if (pNode->isOutput() && cursor == word.size()) {
+    for (auto &letter : word) {
+        if (!letterIsInAlphabet(alphabet, letter)) {
+            invalidLetter = true;
             break;
         }
     }
 
-    return cursor == word.size();
+    if (invalidLetter || input == nullptr) {
+        return false;
+    }
+
+    int index = 0;
+
+    bool isExit = input->isOutput();
+
+    Node *pNode = input;
+
+    bool endTravel = false;
+
+    while (index < word.size() && !endTravel) {
+
+        isExit = pNode->isOutput();
+
+        pNode = pNode->next(word[index]);
+
+        endTravel = pNode == nullptr;
+
+        if (!endTravel) {
+            index++;
+        }
+    }
+
+    return isExit && index == word.size();
+
 }
 
 const std::list<Node *> &Automaton::getNodes() const {
@@ -107,7 +119,7 @@ const std::vector<char> &Automaton::getAlphabet() const {
     return alphabet;
 }
 
-bool Automaton::letterIsInAlphabet(const std::vector<char> alphabet, char letter) {
+bool Automaton::letterIsInAlphabet(const std::vector<char> &alphabet, char letter) {
 
     bool find = false;
 

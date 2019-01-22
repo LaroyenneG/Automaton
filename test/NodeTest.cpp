@@ -15,35 +15,40 @@ void NodeTest::runTest() {
     alphabet.push_back('c');
     alphabet.push_back('d');
 
-    Node *node = new Node(45, alphabet);
+    Node node(45, alphabet);
 
 
-    CPPUNIT_ASSERT(node->getId() == 45);
-    CPPUNIT_ASSERT(node->getTransitions().empty());
-    CPPUNIT_ASSERT(node->isOutput());
-    CPPUNIT_ASSERT(node->next('a') == nullptr);
+    CPPUNIT_ASSERT(node.getId() == 45);
+    CPPUNIT_ASSERT(node.getTransitions().empty());
+    CPPUNIT_ASSERT(node.isOutput());
+    CPPUNIT_ASSERT(node.next('a') == nullptr);
 
     try {
-        node->next('z');
+        node.next('z');
         CPPUNIT_FAIL("error");
     } catch (const std::string &str) {}
 
     try {
-        node->putTransition('a', nullptr);
+        node.putTransition('a', nullptr);
         CPPUNIT_FAIL("error");
     } catch (const std::string &str) {}
 
 
-    node->putTransition('c', node);
+    node.putTransition('c', &node);
 
-    CPPUNIT_ASSERT(!node->isOutput());
+    CPPUNIT_ASSERT(!node.isOutput());
 
-    node->markOutput();
+    node.markOutput();
 
-    CPPUNIT_ASSERT(node->isOutput());
+    CPPUNIT_ASSERT(node.isOutput());
 
+    node.unmarkOutput();
 
-    delete node;
+    CPPUNIT_ASSERT(!node.isOutput());
+
+    node.removeNode(&node);
+
+    CPPUNIT_ASSERT(node.isOutput());
 }
 
 

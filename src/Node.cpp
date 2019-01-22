@@ -27,12 +27,11 @@ void Node::removeNode(Node *node) {
     for (auto transition : transitions) {
         if (transition.second == node) {
             toDelete.push_back(transition.first);
-            delete transition.second;
         }
     }
 
-    for (auto transition : toDelete) {
-        transitions.erase(transition);
+    for (auto letter : toDelete) {
+        transitions.erase(letter);
     }
 }
 
