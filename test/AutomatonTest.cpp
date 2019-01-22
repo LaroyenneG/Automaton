@@ -26,7 +26,7 @@ void AutomatonTest::runTest() {
     CPPUNIT_ASSERT(!automaton.recognize("a"));
 
     Node *nodes[10];
-    for (Node *&n: nodes) {
+    for (auto &n: nodes) {
         n = automaton.generateNewNode();
     }
 
@@ -34,4 +34,18 @@ void AutomatonTest::runTest() {
 
 
     CPPUNIT_ASSERT(automaton.recognize(""));
+
+    Node *input = automaton.getInput();
+    input->putTransition('a', input);
+    input->markOutput();
+
+    CPPUNIT_ASSERT(automaton.recognize("a"));
+    CPPUNIT_ASSERT(automaton.recognize("aa"));
+    CPPUNIT_ASSERT(automaton.recognize("aaa"));
+    CPPUNIT_ASSERT(automaton.recognize("aaaaaa"));
+    CPPUNIT_ASSERT(automaton.recognize(""));
+    CPPUNIT_ASSERT(!automaton.recognize("b"));
+
+    automaton.destroyNode(input);
+    CPPUNIT_ASSERT(!automaton.recognize("a"));
 }
