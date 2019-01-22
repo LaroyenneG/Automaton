@@ -10,6 +10,10 @@
 Node::Node(unsigned int _id, const std::vector<char> &_alphabet) : id(_id), alphabet(_alphabet), outNode(false) {
 }
 
+Node::Node(const Node &node) : id(node.id), alphabet(node.alphabet), outNode(node.outNode) {
+
+}
+
 unsigned int Node::getId() const {
     return id;
 }
@@ -20,51 +24,47 @@ bool Node::isOutput() const {
     return transitions.empty() || outNode;
 }
 
-void Node::removeNode(Node *node) {
+void Node::removeNode(unsigned int nodeId) {
 
-    std::vector<char> toDelete;
+    std::vector<char> linkToDelete;
 
     for (auto transition : transitions) {
-        if (transition.second == node) {
-            toDelete.push_back(transition.first);
+        if (transition.second == nodeId) {
+            linkToDelete.push_back(transition.first);
         }
     }
 
-    for (auto letter : toDelete) {
+    for (auto letter : linkToDelete) {
         transitions.erase(letter);
     }
 }
 
-Node *Node::next(char letter) const {
+unsigned int Node::next(char letter) const {
 
     if (!Automaton::letterIsInAlphabet(alphabet, letter)) {
         throw std::string("unknown letter");
     }
 
-    Node *pNode = nullptr;
+    unsigned int id = UNKNOWN_NODE_ID_VALUE;
 
     auto it = transitions.find(letter);
     if (it != transitions.end()) {
-        pNode = (*it).second;
+        id = (*it).second;
     }
 
-    return pNode;
+    return id;
 }
 
-void Node::putTransition(char letter, Node *node) {
+void Node::putTransition(char letter, unsigned int nodeId) {
 
     if (!Automaton::letterIsInAlphabet(alphabet, letter)) {
         throw std::string("unknown letter");
     }
 
-    if (node == nullptr) {
-        throw std::string("node can not be null");
-    }
-
-    transitions[letter] = node;
+    transitions[letter] = nodeId;
 }
 
-const std::map<char, Node *> &Node::getTransitions() const {
+const std::map<char, unsigned int> &Node::getTransitions() const {
     return transitions;
 }
 
@@ -72,6 +72,8 @@ void Node::markOutput() {
     outNode = true;
 }
 
-void Node::unmarkOutput() {
+void Node::unMarkOutput() {
     outNode = false;
 }
+
+

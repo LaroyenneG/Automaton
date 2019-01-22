@@ -21,7 +21,7 @@ void NodeTest::runTest() {
     CPPUNIT_ASSERT(node.getId() == 45);
     CPPUNIT_ASSERT(node.getTransitions().empty());
     CPPUNIT_ASSERT(node.isOutput());
-    CPPUNIT_ASSERT(node.next('a') == nullptr);
+    CPPUNIT_ASSERT(node.next('a') == 0);
 
     try {
         node.next('z');
@@ -29,12 +29,12 @@ void NodeTest::runTest() {
     } catch (const std::string &str) {}
 
     try {
-        node.putTransition('a', nullptr);
+        node.putTransition('a', 0);
         CPPUNIT_FAIL("error");
     } catch (const std::string &str) {}
 
 
-    node.putTransition('c', &node);
+    node.putTransition('c', 1);
 
     CPPUNIT_ASSERT(!node.isOutput());
 
@@ -42,11 +42,11 @@ void NodeTest::runTest() {
 
     CPPUNIT_ASSERT(node.isOutput());
 
-    node.unmarkOutput();
+    node.unMarkOutput();
 
     CPPUNIT_ASSERT(!node.isOutput());
 
-    node.removeNode(&node);
+    node.removeNode(1);
 
     CPPUNIT_ASSERT(node.isOutput());
 }

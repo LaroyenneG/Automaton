@@ -14,34 +14,39 @@ class Automaton {
 
 private:
     std::mutex mutex;
+
     unsigned int nodeCounter;
 
     std::vector<char> alphabet;
 
-    std::list<Node *> nodes;
+    std::map<unsigned int, Node *> nodes;
 
-    Node *input;
+    unsigned int inputNodeId;
 
     unsigned int nextNodeId();
 
 public:
     explicit Automaton();
 
+    Automaton(const Automaton &automaton);
+
     void addLetter(char c);
 
     explicit operator std::string() const;
 
-    Node *generateNewNode();
+    unsigned int generateNewNode();
 
-    void destroyNode(Node *node);
+    void destroyNode(unsigned int nodeId);
 
     Node *getInput() const;
-
-    const std::list<Node *> &getNodes() const;
 
     const std::vector<char> &getAlphabet() const;
 
     bool recognize(const std::string &word) const;
+
+    Node *getNode(unsigned int id) const;
+
+    void putAllNodeId(std::vector<unsigned int> &ids) const;
 
     ~Automaton();
 

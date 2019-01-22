@@ -7,35 +7,38 @@
 
 #include <map>
 
+#define UNKNOWN_NODE_ID_VALUE 0
 
 class Node {
 
 private:
     bool outNode;
     unsigned int id;
-    std::map<char, Node *> transitions;
+    std::map<char, unsigned int> transitions;
     const std::vector<char> &alphabet;
 
 public:
     explicit Node(unsigned int _id, const std::vector<char> &_alphabet);
 
+    Node(const Node &node);
+
     unsigned int getId() const;
 
     bool isOutput() const;
 
-    void removeNode(Node *node);
+    void removeNode(unsigned int nodeId);
 
-    void putTransition(char letter, Node *node);
+    void putTransition(char letter, unsigned int nodeId);
 
-    const std::map<char, Node *> &getTransitions() const;
+    const std::map<char, unsigned int> &getTransitions() const;
 
     void markOutput();
 
-    void unmarkOutput();
+    void unMarkOutput();
 
     ~Node();
 
-    Node *next(char letter) const;
+    unsigned int next(char letter) const;
 };
 
 

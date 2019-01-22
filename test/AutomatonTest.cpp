@@ -13,7 +13,11 @@ void AutomatonTest::runTest() {
     Automaton automaton;
 
     CPPUNIT_ASSERT(automaton.getAlphabet().empty());
-    CPPUNIT_ASSERT(automaton.getNodes().size() == 1);
+
+    std::vector<unsigned int> nodesId;
+    automaton.putAllNodeId(nodesId);
+
+    CPPUNIT_ASSERT(nodesId.size() == 1);
     CPPUNIT_ASSERT(automaton.getInput() != nullptr);
 
 
@@ -25,18 +29,21 @@ void AutomatonTest::runTest() {
 
     CPPUNIT_ASSERT(!automaton.recognize("a"));
 
-    Node *nodes[10];
+    unsigned int nodes[10];
     for (auto &n: nodes) {
         n = automaton.generateNewNode();
     }
 
-    CPPUNIT_ASSERT(automaton.getNodes().size() == 11);
+    nodesId.clear();
+    automaton.putAllNodeId(nodesId);
+
+    CPPUNIT_ASSERT(nodesId.size() == 11);
 
 
     CPPUNIT_ASSERT(automaton.recognize(""));
 
     Node *input = automaton.getInput();
-    input->putTransition('a', input);
+    input->putTransition('a', input->getId());
     input->markOutput();
 
     CPPUNIT_ASSERT(automaton.recognize("a"));
@@ -46,6 +53,6 @@ void AutomatonTest::runTest() {
     CPPUNIT_ASSERT(automaton.recognize(""));
     CPPUNIT_ASSERT(!automaton.recognize("b"));
 
-    automaton.destroyNode(input);
+    automaton.destroyNode(input->getId());
     CPPUNIT_ASSERT(!automaton.recognize("a"));
 }

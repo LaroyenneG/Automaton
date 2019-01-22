@@ -15,8 +15,12 @@ unsigned int Automaton::nextNodeId() {
     return id;
 }
 
-Automaton::Automaton() : input(nullptr), nodeCounter(0) {
-    input = generateNewNode();
+Automaton::Automaton() : inputNodeId(UNKNOWN_NODE_ID_VALUE), nodeCounter(1) {
+    inputNodeId = generateNewNode();
+}
+
+Automaton::Automaton(const Automaton &automaton) {
+
 }
 
 Automaton::operator std::string() const {
@@ -33,31 +37,36 @@ void Automaton::addLetter(char c) {
 }
 
 Automaton::~Automaton() {
-    while (!nodes.empty()) {
-        destroyNode(nodes.front());
+
+    auto mapNodeCopy = nodes;
+
+    for (auto &pair : mapNodeCopy) {
+        destroyNode(pair.first);
     }
 }
 
-Node *Automaton::generateNewNode() {
+unsigned int Automaton::generateNewNode() {
 
-    Node *node = new Node(nextNodeId(), alphabet);
+    auto id = nextNodeId();
 
-    nodes.push_back(node);
+    nodes[id] = new Node(id, alphabet);
 
-    return node;
+    return id;
 }
 
-void Automaton::destroyNode(Node *node) {
+void Automaton::destroyNode(unsigned int nodeId) {
 
-    for (Node *&n : nodes) {
-        n->removeNode(node);
+    for (auto &pair : nodes) {
+        pair.second->removeNode(nodeId);
     }
 
-    nodes.remove(node);
-
-    if (node == input) {
-        input = nullptr;
+    if (nodeId == inputNodeId) {
+        inputNodeId = UNKNOWN_NODE_ID_VALUE;
     }
+
+    Node *node = getNode(nodeId);
+
+    nodes.erase(nodeId);
 
     delete node;
 }
@@ -78,15 +87,17 @@ bool Automaton::recognize(const std::string &word) const {
         }
     }
 
-    if (invalidLetter || input == nullptr) {
+    Node *inputNode = getInput();
+
+    if (invalidLetter || inputNode == nullptr) {
         return false;
     }
 
     int index = 0;
 
-    bool isExit = input->isOutput();
+    bool isExit = inputNode->isOutput();
 
-    Node *pNode = input;
+    Node *pNode = inputNode;
 
     bool endTravel = false;
 
@@ -94,25 +105,21 @@ bool Automaton::recognize(const std::string &word) const {
 
         isExit = pNode->isOutput();
 
-        pNode = pNode->next(word[index]);
+        unsigned int nodeId = pNode->next(word[index]);
 
-        endTravel = pNode == nullptr;
+        endTravel = nodeId == UNKNOWN_NODE_ID_VALUE;
 
         if (!endTravel) {
             index++;
+            pNode = getNode(nodeId);
         }
     }
 
     return isExit && index == word.size();
-
-}
-
-const std::list<Node *> &Automaton::getNodes() const {
-    return nodes;
 }
 
 Node *Automaton::getInput() const {
-    return input;
+    return getNode(inputNodeId);
 }
 
 const std::vector<char> &Automaton::getAlphabet() const {
@@ -132,3 +139,26 @@ bool Automaton::letterIsInAlphabet(const std::vector<char> &alphabet, char lette
 
     return find;
 }
+
+Node *Automaton::getNode(unsigned int id) const {
+
+    Node *node = nullptr;
+
+    auto pair = nodes.find(id);
+    if (pair != nodes.end()) {
+        node = (*pair).second;
+    } else {
+        throw std::string("invalid node id");
+    }
+
+    return node;
+}
+
+void Automaton::putAllNodeId(std::vector<unsigned int> &ids) const {
+
+    for (auto &pair: nodes) {
+        ids.push_back(pair.first);
+    }
+}
+
+
