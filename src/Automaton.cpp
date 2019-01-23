@@ -56,6 +56,8 @@ unsigned int Automaton::generateNewNode() {
 
 void Automaton::destroyNode(unsigned int nodeId) {
 
+    Node *node = getNode(nodeId);
+
     for (auto &pair : nodes) {
         pair.second->removeNode(nodeId);
     }
@@ -63,8 +65,6 @@ void Automaton::destroyNode(unsigned int nodeId) {
     if (nodeId == inputNodeId) {
         inputNodeId = UNKNOWN_NODE_ID_VALUE;
     }
-
-    Node *node = getNode(nodeId);
 
     nodes.erase(nodeId);
 
@@ -87,11 +87,12 @@ bool Automaton::recognize(const std::string &word) const {
         }
     }
 
-    Node *inputNode = getInput();
-
-    if (invalidLetter || inputNode == nullptr) {
+    if (invalidLetter || inputNodeId == UNKNOWN_NODE_ID_VALUE) {
         return false;
     }
+
+
+    Node *inputNode = getInput();
 
     int index = 0;
 

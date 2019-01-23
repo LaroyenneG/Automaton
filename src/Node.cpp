@@ -61,6 +61,10 @@ void Node::putTransition(char letter, unsigned int nodeId) {
         throw std::string("unknown letter");
     }
 
+    if (nodeId == UNKNOWN_NODE_ID_VALUE) {
+        throw std::string("invalid node id");
+    }
+
     transitions[letter] = nodeId;
 }
 
