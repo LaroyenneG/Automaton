@@ -15,10 +15,9 @@ private:
     bool outNode;
     unsigned int id;
     std::map<char, unsigned int> transitions;
-    const std::vector<char> &alphabet;
 
 public:
-    explicit Node(unsigned int _id, const std::vector<char> &_alphabet);
+    explicit Node(unsigned int _id);
 
     Node(const Node &node);
 

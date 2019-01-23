@@ -50,6 +50,8 @@ public:
 
     void putAllNodeId(std::vector<unsigned int> &ids) const;
 
+    void putLink(unsigned int src, unsigned int dst, char letter);
+
     ~Automaton();
 
     bool operator==(const std::string &word) const;

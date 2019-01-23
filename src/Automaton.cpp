@@ -50,7 +50,7 @@ unsigned int Automaton::generateNewNode() {
 
     auto id = nextNodeId();
 
-    nodes[id] = new Node(id, alphabet);
+    nodes[id] = new Node(id);
 
     return id;
 }
@@ -183,6 +183,18 @@ Automaton &Automaton::operator=(const Automaton &automaton) {
     nodeCounter = automaton.nodeCounter;
 
     return *this;
+}
+
+void Automaton::putLink(unsigned int src, unsigned int dst, char letter) {
+
+    if (!letterIsInAlphabet(alphabet, letter)) {
+        throw "invalid letter id";
+    }
+
+    Node *srcNode = getNode(src);
+    Node *dstNode = getNode(dst);
+
+    srcNode->putTransition(letter, dstNode->getId());
 }
 
 

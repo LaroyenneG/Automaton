@@ -7,11 +7,10 @@
 #include "Node.h"
 #include "Automaton.h"
 
-Node::Node(unsigned int _id, const std::vector<char> &_alphabet) : id(_id), alphabet(_alphabet), outNode(false) {
+Node::Node(unsigned int _id) : id(_id), outNode(false) {
 }
 
-Node::Node(const Node &node) : id(node.id), alphabet(node.alphabet), outNode(node.outNode),
-                               transitions(node.transitions) {
+Node::Node(const Node &node) : id(node.id), outNode(node.outNode), transitions(node.transitions) {
 
 }
 
@@ -42,10 +41,6 @@ void Node::removeNode(unsigned int nodeId) {
 
 unsigned int Node::next(char letter) const {
 
-    if (!Automaton::letterIsInAlphabet(alphabet, letter)) {
-        throw std::string("unknown letter");
-    }
-
     unsigned int id = UNKNOWN_NODE_ID_VALUE;
 
     auto it = transitions.find(letter);
@@ -57,10 +52,6 @@ unsigned int Node::next(char letter) const {
 }
 
 void Node::putTransition(char letter, unsigned int nodeId) {
-
-    if (!Automaton::letterIsInAlphabet(alphabet, letter)) {
-        throw std::string("unknown letter");
-    }
 
     if (nodeId == UNKNOWN_NODE_ID_VALUE) {
         throw std::string("invalid node id");

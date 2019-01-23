@@ -15,7 +15,7 @@ void NodeTest::runTest() {
     alphabet.push_back('c');
     alphabet.push_back('d');
 
-    Node node(45, alphabet);
+    Node node(45);
 
 
     CPPUNIT_ASSERT(node.getId() == 45);
@@ -23,10 +23,6 @@ void NodeTest::runTest() {
     CPPUNIT_ASSERT(node.isOutput());
     CPPUNIT_ASSERT(node.next('a') == UNKNOWN_NODE_ID_VALUE);
 
-    try {
-        node.next('z');
-        CPPUNIT_FAIL("error");
-    } catch (const std::string &str) {}
 
     try {
         node.putTransition('a', UNKNOWN_NODE_ID_VALUE);
