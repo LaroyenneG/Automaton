@@ -21,7 +21,7 @@ Automaton::Automaton() : inputNodeId(UNKNOWN_NODE_ID_VALUE), nodeCounter(1) {
 
 Automaton::Automaton(const Automaton &automaton) : inputNodeId(automaton.inputNodeId),
                                                    nodeCounter(automaton.nodeCounter), alphabet(automaton.alphabet) {
-    for (auto &it : nodes) {
+    for (auto &it : automaton.nodes) {
         nodes[it.first] = new Node(*it.second);
     }
 }
@@ -41,9 +41,7 @@ void Automaton::addLetter(char c) {
 
 Automaton::~Automaton() {
 
-    auto mapNodeCopy = nodes;
-
-    for (auto &pair : mapNodeCopy) {
+    for (auto &pair : nodes) {
         destroyNode(pair.first);
     }
 }
@@ -166,6 +164,25 @@ void Automaton::putAllNodeId(std::vector<unsigned int> &ids) const {
 
 unsigned int Automaton::nodeNumber() const {
     return static_cast<unsigned int>(nodes.size());
+}
+
+Automaton &Automaton::operator=(const Automaton &automaton) {
+
+    for (auto &pair : nodes) {
+        destroyNode(pair.first);
+    }
+
+    for (auto &it : automaton.nodes) {
+        nodes[it.first] = new Node(*it.second);
+    }
+
+    inputNodeId = automaton.inputNodeId;
+
+    alphabet = automaton.alphabet;
+
+    nodeCounter = automaton.nodeCounter;
+
+    return *this;
 }
 
 

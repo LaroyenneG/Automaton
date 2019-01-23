@@ -54,6 +54,8 @@ public:
 
     bool operator==(const std::string &word) const;
 
+    Automaton &operator=(const Automaton &automaton);
+
     static bool letterIsInAlphabet(const std::vector<char> &alphabet, char letter);
 };
 
