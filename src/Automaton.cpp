@@ -164,4 +164,8 @@ void Automaton::putAllNodeId(std::vector<unsigned int> &ids) const {
     }
 }
 
+unsigned int Automaton::nodeNumber() const {
+    return static_cast<unsigned int>(nodes.size());
+}
+
 

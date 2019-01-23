@@ -30,6 +30,8 @@ public:
 
     Automaton(const Automaton &automaton);
 
+    unsigned int nodeNumber() const;
+
     void addLetter(char c);
 
     explicit operator std::string() const;
