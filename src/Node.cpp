@@ -10,7 +10,8 @@
 Node::Node(unsigned int _id, const std::vector<char> &_alphabet) : id(_id), alphabet(_alphabet), outNode(false) {
 }
 
-Node::Node(const Node &node) : id(node.id), alphabet(node.alphabet), outNode(node.outNode) {
+Node::Node(const Node &node) : id(node.id), alphabet(node.alphabet), outNode(node.outNode),
+                               transitions(node.transitions) {
 
 }
 

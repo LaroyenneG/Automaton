@@ -19,8 +19,11 @@ Automaton::Automaton() : inputNodeId(UNKNOWN_NODE_ID_VALUE), nodeCounter(1) {
     inputNodeId = generateNewNode();
 }
 
-Automaton::Automaton(const Automaton &automaton) {
-
+Automaton::Automaton(const Automaton &automaton) : inputNodeId(automaton.inputNodeId),
+                                                   nodeCounter(automaton.nodeCounter), alphabet(automaton.alphabet) {
+    for (auto &it : nodes) {
+        nodes[it.first] = new Node(*it.second);
+    }
 }
 
 Automaton::operator std::string() const {
@@ -156,7 +159,6 @@ Node *Automaton::getNode(unsigned int id) const {
 }
 
 void Automaton::putAllNodeId(std::vector<unsigned int> &ids) const {
-
     for (auto &pair: nodes) {
         ids.push_back(pair.first);
     }
