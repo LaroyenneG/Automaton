@@ -5,14 +5,16 @@
 #include "Automaton.h"
 
 
-Automaton::Automaton() : height(MINIMUM_NODE), matrix(nullptr),
-                         width(MINIMUM_ALPHABET), built(false) {
+Automaton::Automaton() :
+        height(MINIMUM_NODE), matrix(nullptr),
+        width(MINIMUM_ALPHABET), built(false) {
 
 }
 
-Automaton::Automaton(const Automaton &automaton) : alphabet(automaton.alphabet), height(automaton.height),
-                                                   width(automaton.width), built(automaton.built),
-                                                   matrix(allocate(automaton.width, automaton.height)) {
+Automaton::Automaton(const Automaton &automaton) :
+        alphabet(automaton.alphabet), height(automaton.height),
+        width(automaton.width), built(automaton.built),
+        matrix(allocate(automaton.width, automaton.height)) {
 
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
@@ -228,6 +230,10 @@ void Automaton::unMarkExit(unsigned int node) {
     }
 
     matrix[node][width - 1] = EMPTY_NODE;
+}
+
+unsigned int Automaton::nodeNumber() const {
+    return height;
 }
 
 

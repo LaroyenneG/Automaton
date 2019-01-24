@@ -51,6 +51,8 @@ public:
 
     void detroydMatrix();
 
+    unsigned int nodeNumber() const;
+
     ~Automaton();
 
     Automaton &operator=(const Automaton &automaton);
