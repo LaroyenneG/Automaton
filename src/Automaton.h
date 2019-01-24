@@ -8,53 +8,50 @@
 #include <list>
 #include <vector>
 #include <mutex>
-#include "Node.h"
+
+#define MINIMUM_NODE 1
+#define MINIMUM_ALPHABET 1
+#define EMPTY_NODE -5
+#define EXIT_NODE -6
 
 class Automaton {
 
 private:
-    std::mutex mutex;
-
-    unsigned int nodeCounter;
-
     std::vector<char> alphabet;
+    int **matrix;
+    unsigned int width;
+    unsigned int height;
 
-    std::map<unsigned int, Node *> nodes;
+    bool built;
 
-    unsigned int inputNodeId;
+    static int **allocate(unsigned int x, unsigned int y);
 
-    unsigned int nextNodeId();
+    static void freeMatrix(int **matrix, unsigned int height);
 
 public:
     explicit Automaton();
 
     Automaton(const Automaton &automaton);
 
-    unsigned int nodeNumber() const;
-
-    void addLetter(char c);
-
-    explicit operator std::string() const;
-
-    unsigned int generateNewNode();
-
-    void destroyNode(unsigned int nodeId);
-
-    Node *getInput() const;
+    void addLetter(char letter);
 
     const std::vector<char> &getAlphabet() const;
 
+    void addNode();
+
     bool recognize(const std::string &word) const;
-
-    Node *getNode(unsigned int id) const;
-
-    void putAllNodeId(std::vector<unsigned int> &ids) const;
 
     void putLink(unsigned int src, unsigned int dst, char letter);
 
-    ~Automaton();
+    void markExit(unsigned int node);
 
-    bool operator==(const std::string &word) const;
+    void unMarkExit(unsigned int node);
+
+    void buildMatrix();
+
+    void detroydMatrix();
+
+    ~Automaton();
 
     Automaton &operator=(const Automaton &automaton);
 

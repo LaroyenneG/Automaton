@@ -14,12 +14,6 @@ void AutomatonTest::runTest() {
 
     CPPUNIT_ASSERT(automaton.getAlphabet().empty());
 
-    std::vector<unsigned int> nodesId;
-    automaton.putAllNodeId(nodesId);
-
-    CPPUNIT_ASSERT(nodesId.size() == 1);
-    CPPUNIT_ASSERT(automaton.getInput() != nullptr);
-
 
     for (char c = 'a'; c <= 'z'; c++) {
         automaton.addLetter(c);
@@ -27,24 +21,15 @@ void AutomatonTest::runTest() {
 
     CPPUNIT_ASSERT(automaton.getAlphabet().size() == 26);
 
+    automaton.buildMatrix();
+
     CPPUNIT_ASSERT(!automaton.recognize("a"));
 
-    unsigned int nodes[10];
-    for (auto &n: nodes) {
-        n = automaton.generateNewNode();
-    }
-
-    nodesId.clear();
-    automaton.putAllNodeId(nodesId);
-
-    CPPUNIT_ASSERT(nodesId.size() == 11);
-
+    automaton.markExit(0);
 
     CPPUNIT_ASSERT(automaton.recognize(""));
 
-    Node *input = automaton.getInput();
-    input->putTransition('a', input->getId());
-    input->markOutput();
+    automaton.putLink(0, 0, 'a');
 
     CPPUNIT_ASSERT(automaton.recognize("a"));
     CPPUNIT_ASSERT(automaton.recognize("aa"));
@@ -53,6 +38,7 @@ void AutomatonTest::runTest() {
     CPPUNIT_ASSERT(automaton.recognize(""));
     CPPUNIT_ASSERT(!automaton.recognize("b"));
 
-    automaton.destroyNode(input->getId());
+    automaton.unMarkExit(0);
+
     CPPUNIT_ASSERT(!automaton.recognize("a"));
 }

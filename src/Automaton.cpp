@@ -4,124 +4,55 @@
 
 #include "Automaton.h"
 
-unsigned int Automaton::nextNodeId() {
 
-    mutex.lock();
+Automaton::Automaton() : height(MINIMUM_NODE), matrix(nullptr),
+                         width(MINIMUM_ALPHABET), built(false) {
 
-    unsigned int id = nodeCounter++;
-
-    mutex.unlock();
-
-    return id;
 }
 
-Automaton::Automaton() : inputNodeId(UNKNOWN_NODE_ID_VALUE), nodeCounter(1) {
-    inputNodeId = generateNewNode();
-}
+Automaton::Automaton(const Automaton &automaton) : alphabet(automaton.alphabet), height(automaton.height),
+                                                   width(automaton.width), built(automaton.built),
+                                                   matrix(allocate(automaton.width, automaton.height)) {
 
-Automaton::Automaton(const Automaton &automaton) : inputNodeId(automaton.inputNodeId),
-                                                   nodeCounter(automaton.nodeCounter), alphabet(automaton.alphabet) {
-    for (auto &it : automaton.nodes) {
-        nodes[it.first] = new Node(*it.second);
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            matrix[i][j] = automaton.matrix[i][j];
+        }
     }
 }
 
-Automaton::operator std::string() const {
+int **Automaton::allocate(unsigned int x, unsigned int y) {
 
-    std::string string = "Automaton(";
-    string.append(std::to_string(nodes.size()));
-    string.append(")");
+    auto **table = new int *[y];
+    for (int i = 0; i < y; ++i) {
+        table[i] = new int[x];
+        for (int j = 0; j < x; ++j) {
+            table[i][j] = EMPTY_NODE;
+        }
+    }
 
-    return string;
-}
-
-void Automaton::addLetter(char c) {
-    alphabet.push_back(c);
+    return table;
 }
 
 Automaton::~Automaton() {
-
-    for (auto &pair : nodes) {
-        destroyNode(pair.first);
+    if (built) {
+        freeMatrix(matrix, height);
     }
 }
 
-unsigned int Automaton::generateNewNode() {
+void Automaton::addLetter(char letter) {
 
-    auto id = nextNodeId();
-
-    nodes[id] = new Node(id);
-
-    return id;
-}
-
-void Automaton::destroyNode(unsigned int nodeId) {
-
-    Node *node = getNode(nodeId);
-
-    for (auto &pair : nodes) {
-        pair.second->removeNode(nodeId);
+    if (built) {
+        throw std::string("cannot add a letter after matrix's building");
     }
 
-    if (nodeId == inputNodeId) {
-        inputNodeId = UNKNOWN_NODE_ID_VALUE;
+    if (letterIsInAlphabet(alphabet, letter)) {
+        return;
     }
 
-    nodes.erase(nodeId);
+    alphabet.push_back(letter);
 
-    delete node;
-}
-
-bool Automaton::operator==(const std::string &word) const {
-
-    return recognize(word);
-}
-
-bool Automaton::recognize(const std::string &word) const {
-
-    bool invalidLetter = false;
-
-    for (auto &letter : word) {
-        if (!letterIsInAlphabet(alphabet, letter)) {
-            invalidLetter = true;
-            break;
-        }
-    }
-
-    if (invalidLetter || inputNodeId == UNKNOWN_NODE_ID_VALUE) {
-        return false;
-    }
-
-
-    Node *inputNode = getInput();
-
-    int index = 0;
-
-    bool isExit = inputNode->isOutput();
-
-    Node *pNode = inputNode;
-
-    bool endTravel = false;
-
-    while (index < word.size() && !endTravel) {
-
-        isExit = pNode->isOutput();
-
-        unsigned int nodeId = pNode->next(word[index]);
-
-        endTravel = nodeId == UNKNOWN_NODE_ID_VALUE;
-
-        if (!endTravel) {
-            index++;
-            pNode = getNode(nodeId);
-        }
-    }
-
-    return isExit && index == word.size();
-}
-
-Node *Automaton::getInput() const {
-    return getNode(inputNodeId);
+    width = static_cast<unsigned int>(alphabet.size() + 1);
 }
 
 const std::vector<char> &Automaton::getAlphabet() const {
@@ -130,71 +61,176 @@ const std::vector<char> &Automaton::getAlphabet() const {
 
 bool Automaton::letterIsInAlphabet(const std::vector<char> &alphabet, char letter) {
 
-    bool find = false;
-
-    for (auto &c: alphabet) {
-        if (c == letter) {
-            find = true;
-            break;
+    for (auto &l : alphabet) {
+        if (l == letter) {
+            return true;
         }
     }
 
-    return find;
+    return false;
 }
 
-Node *Automaton::getNode(unsigned int id) const {
+void Automaton::addNode() {
 
-    Node *node = nullptr;
-
-    auto pair = nodes.find(id);
-    if (pair != nodes.end()) {
-        node = (*pair).second;
-    } else {
-        throw std::string("invalid node id");
+    if (!built) {
+        throw std::string("matrix is not built");
     }
 
-    return node;
+    auto oldMatrix = matrix;
+    auto oldHeight = height;
+
+    height++;
+
+    matrix = new int *[height];
+
+    for (int i = 0; i < oldHeight; ++i) {
+        matrix[i] = oldMatrix[i];
+    }
+
+    for (int i = 0; i < width; ++i) {
+        matrix[oldHeight][i] = EMPTY_NODE;
+    }
+
+    delete[] oldMatrix;
 }
 
-void Automaton::putAllNodeId(std::vector<unsigned int> &ids) const {
-    for (auto &pair: nodes) {
-        ids.push_back(pair.first);
-    }
-}
+bool Automaton::recognize(const std::string &word) const {
 
-unsigned int Automaton::nodeNumber() const {
-    return static_cast<unsigned int>(nodes.size());
-}
-
-Automaton &Automaton::operator=(const Automaton &automaton) {
-
-    for (auto &pair : nodes) {
-        destroyNode(pair.first);
+    if (!built) {
+        throw std::string("matrix is not built");
     }
 
-    for (auto &it : automaton.nodes) {
-        nodes[it.first] = new Node(*it.second);
+    int counter = 0;
+    int node = 0;
+
+    for (char letter : word) {
+
+        for (int c = 0; c < alphabet.size(); ++c) {
+
+            if (letter == alphabet[c]) {
+
+                int next = matrix[node][c];
+
+                if (next != EMPTY_NODE) {
+                    node = next;
+                    counter++;
+                    break;
+                }
+            }
+        }
     }
 
-    inputNodeId = automaton.inputNodeId;
-
-    alphabet = automaton.alphabet;
-
-    nodeCounter = automaton.nodeCounter;
-
-    return *this;
+    return counter == word.size() && matrix[node][width - 1] == EXIT_NODE;
 }
 
 void Automaton::putLink(unsigned int src, unsigned int dst, char letter) {
 
-    if (!letterIsInAlphabet(alphabet, letter)) {
-        throw "invalid letter id";
+    if (!built) {
+        throw std::string("matrix is not built");
     }
 
-    Node *srcNode = getNode(src);
-    Node *dstNode = getNode(dst);
+    if (src >= height || dst >= height) {
+        throw std::string("invalid node id");
+    }
 
-    srcNode->putTransition(letter, dstNode->getId());
+    int index = -1;
+
+    for (int i = 0; i < alphabet.size(); i++) {
+        if (alphabet[i] == letter) {
+            index = i;
+        }
+    }
+
+    if (index < 0) {
+        throw std::string("invalid letter");
+    }
+
+    matrix[src][index] = dst;
 }
+
+Automaton &Automaton::operator=(const Automaton &automaton) {
+
+    if (built) {
+        freeMatrix(matrix, height);
+    }
+
+    height = automaton.height;
+    width = automaton.width;
+    built = automaton.built;
+
+    if (built) {
+
+        matrix = allocate(width, height);
+
+        for (int i = 0; i < height; ++i) {
+            for (int j = 0; j < width; ++j) {
+                matrix[i][j] = automaton.matrix[i][j];
+            }
+        }
+    }
+
+    return *this;
+}
+
+void Automaton::buildMatrix() {
+
+    if (built) {
+        throw std::string("cannot rebuild matrix");
+    }
+
+    matrix = allocate(width, height);
+
+    built = true;
+}
+
+
+void Automaton::detroydMatrix() {
+
+    if (!built) {
+        throw std::string("cannot destroy matrix");
+    }
+
+    freeMatrix(matrix, height);
+
+    built = false;
+}
+
+void Automaton::freeMatrix(int **matrix, unsigned int height) {
+
+    for (int i = 0; i < height; ++i) {
+        delete[] matrix[i];
+    }
+
+    delete[] matrix;
+}
+
+void Automaton::markExit(unsigned int node) {
+
+    if (!built) {
+        throw std::string("matrix is not built");
+    }
+
+    if (node >= height) {
+        throw std::string("invalid node id");
+    }
+
+    matrix[node][width - 1] = EXIT_NODE;
+}
+
+void Automaton::unMarkExit(unsigned int node) {
+
+    if (!built) {
+        throw std::string("matrix is not built");
+    }
+
+    if (node >= height) {
+        throw std::string("invalid node id");
+    }
+
+    matrix[node][width - 1] = EMPTY_NODE;
+}
+
+
+
 
 
